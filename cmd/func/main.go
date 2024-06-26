@@ -4,10 +4,9 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/google/generative-ai-go/genai"
-	"google.golang.org/api/option"
+	"github.com/siuyin/aigotut/client"
 )
 
 var lightControlTool = &genai.Tool{
@@ -32,26 +31,21 @@ var lightControlTool = &genai.Tool{
 }
 
 func main() {
-	ctx := context.Background()
-	// Access your API key as an environment variable (see "Set up your API key" above)
-	client, err := genai.NewClient(ctx, option.WithAPIKey(os.Getenv("API_KEY")))
+	cl := client.New()
+	defer cl.Close()
+
+	cl.Model.Tools = []*genai.Tool{lightControlTool}
+
+	// Start chat session.
+	cs := cl.Model.StartChat()
+	prompt := "Dim the light so that the room feels cosy and warm."
+	//prompt := "Make the room as bright as the day for reading."
+	//prompt := "Simulate a cool cloudy day, the light should not be too bright."
+	//prompt := "Light the room with a warm, very dim, night light."
+	resp, err := cs.SendMessage(context.Background(), genai.Text(prompt))
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer client.Close()
-
-	// The Gemini 1.5 models are versatile and work with most use cases
-	model := client.GenerativeModel("gemini-1.5-flash")
-
-	model.Tools = []*genai.Tool{lightControlTool}
-
-	// Start chat session.
-	cs := model.StartChat()
-	//prompt := "Dim the light so that the room feels cosy and warm."
-	//prompt := "Make the room as bright as the day for reading."
-	//prompt := "Simulate a cool cloudy day, the light should not be too bright."
-	prompt := "Light the room with a warm, very dim, night light."
-	resp, err := cs.SendMessage(ctx, genai.Text(prompt))
 
 	// check response include function call
 	part := resp.Candidates[0].Content.Parts[0]
