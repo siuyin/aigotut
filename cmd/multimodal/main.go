@@ -2,12 +2,11 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 
 	"github.com/google/generative-ai-go/genai"
-	"google.golang.org/api/iterator"
+	"github.com/siuyin/aigotut/gfmt"
 	"google.golang.org/api/option"
 )
 
@@ -42,27 +41,5 @@ func main() {
 	}
 
 	iter := model.GenerateContentStream(ctx, prompt...)
-
-	for {
-		resp, err := iter.Next()
-		if err == iterator.Done {
-			break
-		}
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		printResponse(resp)
-	}
-}
-
-func printResponse(resp *genai.GenerateContentResponse) {
-	for _, cand := range resp.Candidates {
-		if cand.Content != nil {
-			for _, part := range cand.Content.Parts {
-				fmt.Println(part)
-			}
-		}
-	}
-	fmt.Println("---")
+	gfmt.PrintStreamResponse(iter)
 }

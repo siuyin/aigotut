@@ -2,12 +2,11 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 
 	"github.com/google/generative-ai-go/genai"
-	"google.golang.org/api/iterator"
+	"github.com/siuyin/aigotut/gfmt"
 	"google.golang.org/api/option"
 )
 
@@ -25,26 +24,6 @@ func main() {
 
 	iter := model.GenerateContentStream(ctx, genai.Text("What is the significance of the number 42?"))
 
-	for {
-		resp, err := iter.Next()
-		if err == iterator.Done {
-			break
-		}
-		if err != nil {
-			log.Fatal(err)
-		}
+	gfmt.PrintStreamResponse(iter)
 
-		printResponse(resp)
-	}
-}
-
-func printResponse(resp *genai.GenerateContentResponse) {
-	for _, cand := range resp.Candidates {
-		if cand.Content != nil {
-			for _, part := range cand.Content.Parts {
-				fmt.Println(part)
-			}
-		}
-	}
-	fmt.Println("---")
 }
