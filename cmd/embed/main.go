@@ -10,7 +10,8 @@ import (
 
 func main() {
 	// For embeddings, use the embedding-001 model
-	client.ModelName = "embedding-001"
+	//client.ModelName = "embedding-001"
+	client.ModelName = "text-embedding-004"
 	cl := client.New()
 	defer cl.Close()
 
