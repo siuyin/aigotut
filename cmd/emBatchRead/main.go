@@ -21,6 +21,6 @@ func main() {
 		if err := dec.Decode(&orec); err != nil {
 			break
 		}
-		fmt.Println(orec.ID, orec.Title, orec.Embedding[0])
+		fmt.Println(orec.ID, orec.Title, orec.Embedding[0], orec.Embedding[767])
 	}
 }
