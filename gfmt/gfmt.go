@@ -3,6 +3,7 @@ package gfmt
 
 import (
 	"fmt"
+	"io"
 	"log"
 
 	"github.com/google/generative-ai-go/genai"
@@ -18,6 +19,15 @@ func PrintResponse(resp *genai.GenerateContentResponse) {
 		}
 	}
 	fmt.Println("---")
+}
+func FprintResponse(w io.Writer, resp *genai.GenerateContentResponse) {
+	for _, cand := range resp.Candidates {
+		if cand.Content != nil {
+			for _, part := range cand.Content.Parts {
+				fmt.Fprintln(w, part)
+			}
+		}
+	}
 }
 
 func PrintStreamResponse(iter *genai.GenerateContentResponseIterator) {
