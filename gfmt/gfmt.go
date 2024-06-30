@@ -43,3 +43,16 @@ func PrintStreamResponse(iter *genai.GenerateContentResponseIterator) {
 		PrintResponse(resp)
 	}
 }
+func FprintStreamResponse(w io.Writer, iter *genai.GenerateContentResponseIterator) {
+	for {
+		resp, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		FprintResponse(w, resp)
+	}
+}
