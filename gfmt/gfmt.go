@@ -18,7 +18,6 @@ func PrintResponse(resp *genai.GenerateContentResponse) {
 			}
 		}
 	}
-	fmt.Println("---")
 }
 func FprintResponse(w io.Writer, resp *genai.GenerateContentResponse) {
 	for _, cand := range resp.Candidates {
