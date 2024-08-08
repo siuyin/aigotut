@@ -17,13 +17,13 @@ func main() {
 	// start chat session
 	cs := cl.Model.StartChat()
 	cs.History = []*genai.Content{
-		&genai.Content{
+		{
 			Parts: []genai.Part{
 				genai.Text("Hello, I have 2 dogs in my house."),
 			},
 			Role: "user",
 		},
-		&genai.Content{
+		{
 			Parts: []genai.Part{
 				genai.Text("Great to meet you. What would you like to know?"),
 			},
