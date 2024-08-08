@@ -51,8 +51,8 @@ func main() {
 	}
 	for _, p := range prompts {
 		fmt.Printf("prompt: %s\n", p)
-		content := genai.NewUserContent(genai.Text(p))
-		cs.History = append(cs.History, content)
+		// content := genai.NewUserContent(genai.Text(p))
+		// cs.History = append(cs.History, content) // done automatically see: https://github.com/google/generative-ai-go/blob/817706e16e66703730f666180e2577c3738e4bb9/genai/chat.go#L45
 		resp, err := cs.SendMessage(context.Background(), genai.Text(p))
 		if err != nil {
 			log.Fatal(err)
@@ -82,7 +82,7 @@ func main() {
 		}
 
 		gfmt.PrintResponse(resp)
-		cs.History = append(cs.History, resp.Candidates[0].Content)
+		// cs.History = append(cs.History, resp.Candidates[0].Content)
 	}
 
 }
