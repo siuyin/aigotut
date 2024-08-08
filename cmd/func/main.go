@@ -58,8 +58,17 @@ func main() {
 			log.Fatal(err)
 		}
 
-		fn, ok := checkFunctionCall(resp)
-		if !ok {
+		var (
+			fn *genai.FunctionCall
+			ok bool
+		)
+		switch resp.Candidates[0].Content.Parts[0].(type) {
+		case genai.FunctionCall:
+			fn, ok = checkFunctionCall(resp)
+			if !ok {
+				continue
+			}
+		case genai.Text:
 			gfmt.PrintResponse(resp)
 			continue
 		}
