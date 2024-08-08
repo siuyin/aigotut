@@ -46,11 +46,15 @@ func interactiveSession(cs *genai.ChatSession) {
 	}
 	for _, p := range prompts {
 		fmt.Println(p)
+		c:=genai.NewUserContent(genai.Text(p))
+		cs.History=append(cs.History,c)
+
 		res, err := cs.SendMessage(context.Background(), genai.Text(p))
 		if err != nil {
 			log.Fatal(err)
 		}
 		gfmt.PrintResponse(res)
 		cs.History = append(cs.History, res.Candidates[0].Content)
+		log.Println(res.Candidates[0].Content.Role)
 	}
 }
