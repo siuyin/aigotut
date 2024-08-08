@@ -62,7 +62,7 @@ func main() {
 			fn *genai.FunctionCall
 			ok bool
 		)
-		switch resp.Candidates[0].Content.Parts[0].(type) {
+		switch v := resp.Candidates[0].Content.Parts[0].(type) {
 		case genai.FunctionCall:
 			fn, ok = checkFunctionCall(resp)
 			if !ok {
@@ -71,6 +71,8 @@ func main() {
 		case genai.Text:
 			gfmt.PrintResponse(resp)
 			continue
+		default:
+			log.Printf("unexpected type: %v", v)
 		}
 
 		fnRes := setLightValues(fn.Args["brightness"].(float64), fn.Args["colorTemp"].(string))
