@@ -11,24 +11,24 @@ import (
 )
 
 var lightControlTool = &genai.Tool{
-	FunctionDeclarations: []*genai.FunctionDeclaration{{
-		Name:        "setLightValues",
-		Description: "Set the brightness and color temperature of a room light.",
-		Parameters: &genai.Schema{
-			Type: genai.TypeObject,
-			Properties: map[string]*genai.Schema{
-				"brightness": {
-					Type:        genai.TypeInteger,
-					Description: "Light level from 0 to 100. Zero is off and 100 is full brightness.",
+	FunctionDeclarations: []*genai.FunctionDeclaration{
+		{Name: "setLightValues",
+			Description: "Set the brightness and color temperature of a room light.",
+			Parameters: &genai.Schema{
+				Type: genai.TypeObject,
+				Properties: map[string]*genai.Schema{
+					"brightness": {
+						Type:        genai.TypeInteger,
+						Description: "Light level from 0 to 100. Zero is off and 100 is full brightness.",
+					},
+					"colorTemp": {
+						Type:        genai.TypeString,
+						Description: "Color Temperature of the light fixture which can be daylight, cool or warm.",
+					},
 				},
-				"colorTemp": {
-					Type:        genai.TypeString,
-					Description: "Color Temperature of the light fixture which can be daylight, cool or warm.",
-				},
+				Required: []string{"brightness"},
 			},
-			Required: []string{"brightness"},
-		},
-	}},
+		}},
 }
 
 func main() {

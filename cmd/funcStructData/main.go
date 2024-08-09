@@ -58,6 +58,12 @@ func init() {
 
 func main() {
 	// fmt.Println(story)
+	// printEntities()
+	_ = printEntities // avoid compiler warning
+	fmt.Printf("%s", extractEntitiesFunc())
+}
+
+func printEntities() {
 	str := extractEntities()
 	var ent entities
 	if err := json.Unmarshal([]byte(str), &ent); err != nil {
@@ -117,4 +123,99 @@ func extractEntities() string {
 	ent = strings.ReplaceAll(ent, "```json", "")
 	ent = strings.ReplaceAll(ent, "```", "")
 	return ent
+}
+
+func extractEntitiesFunc() string {
+	var (
+		personSch = &genai.Schema{
+			Type: genai.TypeObject,
+			Properties: map[string]*genai.Schema{
+				"name":             {Type: genai.TypeString},
+				"description":      {Type: genai.TypeString},
+				"start_place_name": {Type: genai.TypeString},
+				"end_place_name":   {Type: genai.TypeString},
+			},
+		}
+		peopleSch = &genai.Schema{
+			Type:  genai.TypeArray,
+			Items: personSch,
+		}
+
+		placeSch = &genai.Schema{
+			Type: genai.TypeObject,
+			Properties: map[string]*genai.Schema{
+				"name":        {Type: genai.TypeString},
+				"description": {Type: genai.TypeString},
+			},
+		}
+		placesSch = &genai.Schema{
+			Type:  genai.TypeArray,
+			Items: placeSch,
+		}
+
+		thingSch = &genai.Schema{
+			Type: genai.TypeObject,
+			Properties: map[string]*genai.Schema{
+				"name":             {Type: genai.TypeString},
+				"description":      {Type: genai.TypeString},
+				"start_place_name": {Type: genai.TypeString},
+				"end_place_name":   {Type: genai.TypeString},
+			},
+		}
+		thingsSch = &genai.Schema{
+			Type:  genai.TypeArray,
+			Items: thingSch,
+		}
+
+		relationshipSch = &genai.Schema{
+			Type: genai.TypeObject,
+			Properties: map[string]*genai.Schema{
+				"person_1_name": {Type: genai.TypeString},
+				"person_2_name": {Type: genai.TypeString},
+				"relationship":  {Type: genai.TypeString},
+			},
+		}
+		relationshipsSch = &genai.Schema{
+			Type:  genai.TypeArray,
+			Items: relationshipSch,
+		}
+
+		entitiesSch = &genai.Schema{
+			Type: genai.TypeObject,
+			Properties: map[string]*genai.Schema{
+				"people":        peopleSch,
+				"places":        placesSch,
+				"things":        thingsSch,
+				"relationships": relationshipsSch,
+			},
+		}
+
+		extractEntitiesTool = &genai.Tool{
+			FunctionDeclarations: []*genai.FunctionDeclaration{
+				{Name: "extractEntities",
+					Description: "Extract entities: names of people, places and things. Also extracts relationships between people.",
+					Parameters:  entitiesSch,
+				},
+			},
+		}
+	)
+	cl.Model.Tools = []*genai.Tool{extractEntitiesTool}
+
+	resp, err := cl.Model.GenerateContent(ctx, genai.Text(fmt.Sprintf(`
+	Please extractEntities within the following story:
+	%s
+	`, story)))
+	if err != nil {
+		log.Printf("extractEntitiesTool: %v", err)
+	}
+	var fnc genai.FunctionCall
+	switch v := resp.Candidates[0].Content.Parts[0].(type) {
+	case genai.FunctionCall:
+		fnc = v
+	case genai.Text:
+		return string(resp.Candidates[0].Content.Parts[0].(genai.Text))
+	default:
+		log.Printf("unexpected type: %v", v)
+	}
+	return fmt.Sprintf("function: %s\n\n%#v\n", fnc.Name,fnc.Args)
 }
