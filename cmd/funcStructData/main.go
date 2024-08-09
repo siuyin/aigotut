@@ -217,5 +217,39 @@ func extractEntitiesFunc() string {
 	default:
 		log.Printf("unexpected type: %v", v)
 	}
-	return fmt.Sprintf("function: %s\n\n%#v\n", fnc.Name,fnc.Args)
+	_ = jsonify // to avoid compiler warning
+	return fmt.Sprintf("function: %s\n\n%#v\n", fnc.Name, fnc.Args)
+	
+}
+
+// TODO: does not quite work yet
+func jsonify(m map[string]any) string {
+	s := ""
+	for k, v := range m {
+		switch vv := v.(type) {
+		case string:
+			s += fmt.Sprintf("{%q: %q}", k, vv)
+		case float64, int:
+			s += fmt.Sprintf("{%q: %v}", k, vv)
+		case map[string]interface{}:
+			if len(k) > 0 {
+				s += fmt.Sprintf("{%q: {%q}}", k, jsonify(vv))
+				break
+			}
+			s += fmt.Sprintf("{%q}\n", jsonify(vv))
+		case []interface{}:
+			el := []string{}
+			for _, u := range vv {
+				el = append(el, fmt.Sprintf("%v", u))
+			}
+			if len(k) > 0 {
+				s += fmt.Sprintf("{%q: [%q]}", k, strings.Join(el, ","))
+			} else {
+				s += fmt.Sprintf("[%q]\n", strings.Join(el, ","))
+			}
+		default:
+			log.Println(k, "is of a type I don't know how to handle")
+		}
+	}
+	return s
 }
