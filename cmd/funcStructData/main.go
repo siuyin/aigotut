@@ -58,8 +58,9 @@ func init() {
 
 func main() {
 	// fmt.Println(story)
-	// printEntities()
-	_ = printEntities // avoid compiler warning
+	printEntities()
+	fmt.Println("----------------------")
+	// _ = printEntities // avoid compiler warning
 	fmt.Printf("%s", extractEntitiesFunc())
 }
 
@@ -132,8 +133,8 @@ func extractEntitiesFunc() string {
 			Properties: map[string]*genai.Schema{
 				"name":             {Type: genai.TypeString},
 				"description":      {Type: genai.TypeString},
-				"start_place_name": {Type: genai.TypeString},
-				"end_place_name":   {Type: genai.TypeString},
+				"start_place_name": {Type: genai.TypeString, Description: "place first seen"},
+				"end_place_name":   {Type: genai.TypeString, Description: "place last seen"},
 			},
 		}
 		peopleSch = &genai.Schema{
@@ -158,8 +159,8 @@ func extractEntitiesFunc() string {
 			Properties: map[string]*genai.Schema{
 				"name":             {Type: genai.TypeString},
 				"description":      {Type: genai.TypeString},
-				"start_place_name": {Type: genai.TypeString},
-				"end_place_name":   {Type: genai.TypeString},
+				"start_place_name": {Type: genai.TypeString, Description: "place first seen"},
+				"end_place_name":   {Type: genai.TypeString, Description: "place last seen"},
 			},
 		}
 		thingsSch = &genai.Schema{
@@ -203,6 +204,8 @@ func extractEntitiesFunc() string {
 
 	resp, err := cl.Model.GenerateContent(ctx, genai.Text(fmt.Sprintf(`
 	Please extractEntities within the following story:
+    All fields are required.
+	Here is the story:
 	%s
 	`, story)))
 	if err != nil {
@@ -219,7 +222,7 @@ func extractEntitiesFunc() string {
 	}
 	_ = jsonify // to avoid compiler warning
 	return fmt.Sprintf("function: %s\n\n%#v\n", fnc.Name, fnc.Args)
-	
+
 }
 
 // TODO: does not quite work yet

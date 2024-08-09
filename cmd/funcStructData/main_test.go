@@ -12,6 +12,6 @@ func TestJsonify(t *testing.T) {
 	}
 	s := jsonify(m)
 	if s != "gerbau" {
-		t.Errorf("unexpected: %q", s)
+		t.Errorf("unexpected: %s", s)
 	}
 }
